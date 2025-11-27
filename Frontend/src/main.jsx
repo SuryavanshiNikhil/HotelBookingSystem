@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Welcome from "./pages/Welcome";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRooms from "./pages/admin/AdminRooms";
@@ -29,6 +30,7 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/welcome" element={<Welcome />} />
 
               <Route element={<ProtectedRoute role="admin" />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />

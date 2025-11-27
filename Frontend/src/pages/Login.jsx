@@ -16,11 +16,14 @@ export default function Login() {
       setLoading(true);
       const res = await API.post("/auth/login", form);
       login(res.data);
+      
 
       if (res.data.user.role === "admin") {
-        nav("/admin/dashboard");
+        localStorage.setItem("userName", res.data.name);
+        nav("/welcome");
       } else {
-        nav("/user/dashboard");
+        localStorage.setItem("userName", res.data.name);
+        nav("/welcome");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
