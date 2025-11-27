@@ -24,28 +24,53 @@ export async function getSummary(req, res) {
 }
 
 // POST /api/admin/rooms
+// export async function createRoom(req, res) {
+//   try {
+//     const { roomNumber, type, pricePerNight, description } = req.body;
+//     if (!roomNumber || !type || !pricePerNight) {
+//       return res
+//         .status(400)
+//         .json({ message: "Room number, type, price are required" });
+//     }
+
+//     const room = await Room.create({
+//       roomNumber,
+//       type,
+//       pricePerNight,
+//       description
+//     });
+
+//     return res.status(201).json(room);
+//   } catch (err) {
+//     console.error("Create room error:", err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// }
+
 export async function createRoom(req, res) {
   try {
-    const { roomNumber, type, pricePerNight, description } = req.body;
-    if (!roomNumber || !type || !pricePerNight) {
-      return res
-        .status(400)
-        .json({ message: "Room number, type, price are required" });
+    if (!req.body.roomNumber || !req.body.type || !req.body.pricePerNight) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : "";
+
     const room = await Room.create({
-      roomNumber,
-      type,
-      pricePerNight,
-      description
+      roomNumber: req.body.roomNumber,
+      type: req.body.type,
+      pricePerNight: req.body.pricePerNight,
+      description: req.body.description,
+      image: imagePath
     });
 
-    return res.status(201).json(room);
+    res.status(201).json(room);
   } catch (err) {
     console.error("Create room error:", err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Failed to create room" });
   }
 }
+
+
 
 // GET /api/admin/rooms
 export async function getAllRooms(req, res) {
@@ -73,39 +98,6 @@ export async function getBookingsByStatus(req, res) {
   }
 }
 
-// PATCH /api/admin/bookings/:id/approve
-// export async function approveBooking(req, res) {
-//   try {
-//     const { id } = req.params;
-//     const booking = await Booking.findById(id)
-//       .populate("room")
-//       .populate("user");
-
-//     if (!booking) {
-//       return res.status(404).json({ message: "Booking not found" });
-//     }
-
-//     // Only move to "Approved", DO NOT book room yet
-//     booking.status = "Approved";
-//     await booking.save();
-
-//     // Email: "Approved, please complete payment"
-//     // await sendBookingStatusEmail(
-//     //   booking.user.email,
-//     //   "Approved",
-//     //   booking.room,
-//     //   {
-//     //     checkInDate: booking.checkInDate,
-//     //     checkOutDate: booking.checkOutDate
-//     //   }
-//     // );
-
-//     return res.json({ message: "Booking approved (awaiting payment)", booking });
-//   } catch (err) {
-//     console.error("Approve booking error:", err);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// }
 
 export async function approveBooking(req, res) {
   try {
@@ -133,32 +125,6 @@ export async function approveBooking(req, res) {
 }
 
 
-// PATCH /api/admin/bookings/:id/reject
-// export async function rejectBooking(req, res) {
-//   try {
-//     const { id } = req.params;
-//     const booking = await Booking.findById(id).populate("room").populate("user");
-//     if (!booking) return res.status(404).json({ message: "Booking not found" });
-
-//     booking.status = "Rejected";
-//     await booking.save();
-
-//     await sendBookingStatusEmail(
-//       booking.user.email,
-//       "Rejected",
-//       booking.room,
-//       {
-//         checkInDate: booking.checkInDate,
-//         checkOutDate: booking.checkOutDate
-//       }
-//     );
-
-//     return res.json({ message: "Booking rejected", booking });
-//   } catch (err) {
-//     console.error("Reject booking error:", err);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// }
 
 
 export async function rejectBooking(req, res) {
