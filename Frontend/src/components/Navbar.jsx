@@ -13,34 +13,19 @@ export default function Navbar() {
   return (
     <nav className="bg-slate-300 shadow-sm rounded-xl px-4 py-3 flex items-center justify-between">
       {user && user.role === "admin" && (
-        <>
-          <Link
-            to="/admin/dashboard"
-            className="font-semibold text-lg text-indigo-600"
-          >
-            HotelBooking
-          </Link>
-        </>
-      )}
-      {!user && (
-        <>
-          <Link
-            to="/"
-            className="font-semibold text-lg text-indigo-600"
-          >
-            HotelBooking
-          </Link>
-        </>
+        <Link  to="/admin/dashboard" className="font-semibold text-lg text-indigo-600">
+          HotelBooking
+        </Link>
       )}
       {user && user.role !== "admin" && (
-        <>
-          <Link
-            to="/user/dashboard"
-            className="font-semibold text-lg text-indigo-600"
-          >
-            HotelBooking
-          </Link>
-        </>
+        <Link   to="/user/dashboard" className="font-semibold text-lg text-indigo-600">
+          HotelBooking
+        </Link>
+      )}
+      {!user && (
+        <Link  to="/" className="font-semibold text-lg text-indigo-600">
+          HotelBooking
+        </Link>
       )}
 
       <div className="flex items-center justify-evenly gap-20 ">

@@ -16,13 +16,10 @@ export default function Login() {
       setLoading(true);
       const res = await API.post("/auth/login", form);
       login(res.data);
-      
 
       if (res.data.user.role === "admin") {
-        localStorage.setItem("userName", res.data.name);
         nav("/welcome");
       } else {
-        localStorage.setItem("userName", res.data.name);
         nav("/welcome");
       }
     } catch (err) {
