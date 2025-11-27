@@ -12,33 +12,78 @@ export default function Navbar() {
 
   return (
     <nav className="bg-slate-300 shadow-sm rounded-xl px-4 py-3 flex items-center justify-between">
-      <Link to="/" className="font-semibold text-lg text-indigo-600">
-        HotelBooking
-      </Link>
+      {user && user.role === "admin" && (
+        <>
+          <Link
+            to="/admin/dashboard"
+            className="font-semibold text-lg text-indigo-600"
+          >
+            HotelBooking
+          </Link>
+        </>
+      )}
+      {!user && (
+        <>
+          <Link
+            to="/"
+            className="font-semibold text-lg text-indigo-600"
+          >
+            HotelBooking
+          </Link>
+        </>
+      )}
+      {user && user.role !== "admin" && (
+        <>
+          <Link
+            to="/user/dashboard"
+            className="font-semibold text-lg text-indigo-600"
+          >
+            HotelBooking
+          </Link>
+        </>
+      )}
 
       <div className="flex items-center justify-evenly gap-20 ">
         {user && user.role === "admin" && (
           <>
-            <Link to="/admin/dashboard" className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/admin/dashboard"
+              className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               Dashboard
             </Link>
-            <Link to="/admin/rooms" className="text-sm px-4 py-2 hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/admin/rooms"
+              className="text-sm px-4 py-2 hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               Rooms
             </Link>
-            <Link to="/admin/bookings" className="text-sm px-4 py-2 hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/admin/bookings"
+              className="text-sm px-4 py-2 hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               Bookings
             </Link>
           </>
         )}
         {user && user.role === "user" && (
           <>
-            <Link to="/user/dashboard" className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/user/dashboard"
+              className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               Dashboard
             </Link>
-            <Link to="/user/rooms" className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/user/rooms"
+              className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               Rooms
             </Link>
-            <Link to="/user/bookings" className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300">
+            <Link
+              to="/user/bookings"
+              className="text-sm px-4 py-2  hover:bg-gray-400 active:scale-95 rounded-lg hover:text-black duration-300"
+            >
               My Bookings
             </Link>
           </>

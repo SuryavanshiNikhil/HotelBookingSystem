@@ -74,9 +74,43 @@ export async function getBookingsByStatus(req, res) {
 }
 
 // PATCH /api/admin/bookings/:id/approve
+// export async function approveBooking(req, res) {
+//   try {
+//     const { id } = req.params;
+//     const booking = await Booking.findById(id)
+//       .populate("room")
+//       .populate("user");
+
+//     if (!booking) {
+//       return res.status(404).json({ message: "Booking not found" });
+//     }
+
+//     // Only move to "Approved", DO NOT book room yet
+//     booking.status = "Approved";
+//     await booking.save();
+
+//     // Email: "Approved, please complete payment"
+//     // await sendBookingStatusEmail(
+//     //   booking.user.email,
+//     //   "Approved",
+//     //   booking.room,
+//     //   {
+//     //     checkInDate: booking.checkInDate,
+//     //     checkOutDate: booking.checkOutDate
+//     //   }
+//     // );
+
+//     return res.json({ message: "Booking approved (awaiting payment)", booking });
+//   } catch (err) {
+//     console.error("Approve booking error:", err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// }
+
 export async function approveBooking(req, res) {
   try {
     const { id } = req.params;
+
     const booking = await Booking.findById(id)
       .populate("room")
       .populate("user");
@@ -85,54 +119,73 @@ export async function approveBooking(req, res) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Only move to "Approved", DO NOT book room yet
     booking.status = "Approved";
     await booking.save();
 
-    // Email: "Approved, please complete payment"
-    await sendBookingStatusEmail(
-      booking.user.email,
-      "Approved",
-      booking.room,
-      {
-        checkInDate: booking.checkInDate,
-        checkOutDate: booking.checkOutDate
-      }
-    );
+    // Email disabled because SMTP not active
+    // await sendBookingStatusEmail(...);
 
-    return res.json({ message: "Booking approved (awaiting payment)", booking });
+    return res.json({ message: "Approved", booking });
   } catch (err) {
     console.error("Approve booking error:", err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 }
 
+
 // PATCH /api/admin/bookings/:id/reject
+// export async function rejectBooking(req, res) {
+//   try {
+//     const { id } = req.params;
+//     const booking = await Booking.findById(id).populate("room").populate("user");
+//     if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+//     booking.status = "Rejected";
+//     await booking.save();
+
+//     await sendBookingStatusEmail(
+//       booking.user.email,
+//       "Rejected",
+//       booking.room,
+//       {
+//         checkInDate: booking.checkInDate,
+//         checkOutDate: booking.checkOutDate
+//       }
+//     );
+
+//     return res.json({ message: "Booking rejected", booking });
+//   } catch (err) {
+//     console.error("Reject booking error:", err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// }
+
+
 export async function rejectBooking(req, res) {
   try {
     const { id } = req.params;
-    const booking = await Booking.findById(id).populate("room").populate("user");
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    const booking = await Booking.findById(id)
+      .populate("room")
+      .populate("user");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
     booking.status = "Rejected";
     await booking.save();
 
-    await sendBookingStatusEmail(
-      booking.user.email,
-      "Rejected",
-      booking.room,
-      {
-        checkInDate: booking.checkInDate,
-        checkOutDate: booking.checkOutDate
-      }
-    );
+    // Email disabled
+    // await sendBookingStatusEmail(...);
 
-    return res.json({ message: "Booking rejected", booking });
+    return res.json({ message: "Rejected", booking });
   } catch (err) {
     console.error("Reject booking error:", err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 }
+
 
 //Remove Booking
 export async function removeRoomBooking(req, res) {
