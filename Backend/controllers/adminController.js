@@ -1,7 +1,5 @@
 import Room from "../models/Room.js";
 import Booking from "../models/Booking.js";
-import User from "../models/User.js";
-import { sendBookingStatusEmail, sendPaymentReceiptEmail } from "../utils/email.js"; 
 
 // GET /api/admin/summary
 export async function getSummary(req, res) {
@@ -24,29 +22,6 @@ export async function getSummary(req, res) {
 }
 
 // POST /api/admin/rooms
-// export async function createRoom(req, res) {
-//   try {
-//     const { roomNumber, type, pricePerNight, description } = req.body;
-//     if (!roomNumber || !type || !pricePerNight) {
-//       return res
-//         .status(400)
-//         .json({ message: "Room number, type, price are required" });
-//     }
-
-//     const room = await Room.create({
-//       roomNumber,
-//       type,
-//       pricePerNight,
-//       description
-//     });
-
-//     return res.status(201).json(room);
-//   } catch (err) {
-//     console.error("Create room error:", err);
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// }
-
 export async function createRoom(req, res) {
   try {
     if (!req.body.roomNumber || !req.body.type || !req.body.pricePerNight) {
@@ -70,8 +45,6 @@ export async function createRoom(req, res) {
   }
 }
 
-
-
 // GET /api/admin/rooms
 export async function getAllRooms(req, res) {
   try {
@@ -83,11 +56,13 @@ export async function getAllRooms(req, res) {
   }
 }
 
-// GET /api/admin/bookings?status=pending|approved|rejected
+// GET /api/admin/bookings
 export async function getBookingsByStatus(req, res) {
   try {
     const status = req.query.status || "Pending";
-    const bookings = await Booking.find({ status: { $regex: new RegExp(`^${status}`, "i") } })
+    const bookings = await Booking.find({
+      status: { $regex: new RegExp(`^${status}`, "i") }
+    })
       .populate("user", "name email")
       .populate("room");
 
@@ -98,7 +73,7 @@ export async function getBookingsByStatus(req, res) {
   }
 }
 
-
+// PATCH /api/admin/bookings/:id/approve
 export async function approveBooking(req, res) {
   try {
     const { id } = req.params;
@@ -114,9 +89,6 @@ export async function approveBooking(req, res) {
     booking.status = "Approved";
     await booking.save();
 
-    // Email disabled because SMTP not active
-    // await sendBookingStatusEmail(...);
-
     return res.json({ message: "Approved", booking });
   } catch (err) {
     console.error("Approve booking error:", err);
@@ -124,9 +96,7 @@ export async function approveBooking(req, res) {
   }
 }
 
-
-
-
+// PATCH /api/admin/bookings/:id/reject
 export async function rejectBooking(req, res) {
   try {
     const { id } = req.params;
@@ -142,9 +112,6 @@ export async function rejectBooking(req, res) {
     booking.status = "Rejected";
     await booking.save();
 
-    // Email disabled
-    // await sendBookingStatusEmail(...);
-
     return res.json({ message: "Rejected", booking });
   } catch (err) {
     console.error("Reject booking error:", err);
@@ -152,8 +119,7 @@ export async function rejectBooking(req, res) {
   }
 }
 
-
-//Remove Booking
+// PATCH /api/admin/rooms/:roomId/remove-booking
 export async function removeRoomBooking(req, res) {
   try {
     const { roomId } = req.params;
@@ -161,12 +127,13 @@ export async function removeRoomBooking(req, res) {
     const room = await Room.findById(roomId);
     if (!room) return res.status(404).json({ message: "Room not found" });
 
-    // Make room available again
     room.isBooked = false;
     await room.save();
 
-    // Update booking status → "Cancelled"
-    const booking = await Booking.findOne({ room: roomId, status: "Paid" });
+    const booking = await Booking.findOne({ room: roomId, status: "Paid" })
+      .populate("room")
+      .populate("user");
+
     if (booking) {
       booking.status = "Cancelled";
       await booking.save();
@@ -174,11 +141,10 @@ export async function removeRoomBooking(req, res) {
 
     return res.json({
       message: "Room is now available again",
-      room,
+      room
     });
   } catch (err) {
     console.error("Remove booking error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 }
-

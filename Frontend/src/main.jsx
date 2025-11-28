@@ -27,7 +27,7 @@ function App() {
           <Navbar />
           <main className="flex-1">
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<Login/>} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/welcome" element={<Welcome />} />

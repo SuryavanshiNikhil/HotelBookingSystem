@@ -1,6 +1,5 @@
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
-import { sendPaymentReceiptEmail } from "../utils/email.js";
 
 // POST /api/bookings
 export async function createBooking(req, res) {
@@ -22,7 +21,6 @@ export async function createBooking(req, res) {
     const room = await Room.findById(roomId);
     if (!room) return res.status(404).json({ message: "Room not found" });
 
-    // Do not auto set isBooked here. Only when admin approves.
     const booking = await Booking.create({
       user: req.user.id,
       room: roomId,
@@ -32,7 +30,12 @@ export async function createBooking(req, res) {
       status: "Pending"
     });
 
-    return res.status(201).json(booking);
+    // Return booking as is
+    const fullBooking = await Booking.findById(booking._id)
+      .populate("room")
+      .populate("user");
+
+    return res.status(201).json(fullBooking);
   } catch (err) {
     console.error("Create booking error:", err);
     return res.status(500).json({ message: "Server error" });
@@ -53,6 +56,7 @@ export async function getMyBookings(req, res) {
   }
 }
 
+// PATCH /api/bookings/:id/pay
 export async function payForBooking(req, res) {
   try {
     const { id } = req.params;
@@ -70,7 +74,9 @@ export async function payForBooking(req, res) {
     }
 
     if (booking.status !== "Approved") {
-      return res.status(400).json({ message: "Booking must be approved first" });
+      return res
+        .status(400)
+        .json({ message: "Booking must be approved first" });
     }
 
     // Simulated payment success
@@ -80,7 +86,10 @@ export async function payForBooking(req, res) {
     booking.room.isBooked = true;
     await booking.room.save();
 
-    return res.json({ message: "Payment successful and room booked", booking });
+    return res.json({
+      message: "Payment successful and room booked",
+      booking
+    });
   } catch (err) {
     console.error("Payment Error:", err);
     return res.status(500).json({ message: "Server error" });

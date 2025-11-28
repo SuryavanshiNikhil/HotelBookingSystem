@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();                   // LOAD .env BEFORE ANYTHING ELSE
+
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
-import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
@@ -12,7 +14,6 @@ import adminRoutes from "./routes/adminRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 
-dotenv.config();
 const app = express();
 
 // Absolute path setup
@@ -36,7 +37,7 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Static uploads folder (IMPORTANT)
+// Static uploads folder
 app.use("/uploads", express.static(uploadPath));
 
 // Routes
@@ -49,9 +50,9 @@ app.get("/", (req, res) => {
   res.send("Hotel Booking API running");
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 
+// Start server
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
